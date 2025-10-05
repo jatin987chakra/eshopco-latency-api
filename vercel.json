@@ -1,8 +1,7 @@
 {
-  "version": 2,
   "builds": [
     {
-      "src": "api/latency.py",
+      "src": "api/index.py",
       "use": "@vercel/python"
     }
   ],
@@ -10,7 +9,11 @@
     {
       "src": "/api/latency",
       "methods": ["POST", "OPTIONS"],
-      "dest": "/api/latency"
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "api/index.py"
     }
   ]
 }
