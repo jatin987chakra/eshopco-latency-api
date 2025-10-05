@@ -6,13 +6,6 @@
       "use": "@vercel/python"
     }
   ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/latency.py",
-      "methods": ["POST", "OPTIONS"]
-    }
-  ],
   "headers": [
     {
       "source": "/api/(.*)",
@@ -26,8 +19,8 @@
           "value": "POST, OPTIONS"
         },
         {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type"
+          "key": "Access-Control-Allow-Headers", 
+          "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
         }
       ]
     }
