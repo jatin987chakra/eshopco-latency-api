@@ -5,5 +5,12 @@
       "src": "api/latency.py",
       "use": "@vercel/python"
     }
+  ],
+  "routes": [
+    {
+      "src": "/api/latency",
+      "methods": ["POST", "OPTIONS"],
+      "dest": "/api/latency.py"
+    }
   ]
 }
