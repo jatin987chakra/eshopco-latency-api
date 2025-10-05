@@ -1,47 +1,47 @@
-from http.client import HTTPException
+
 import json
 import math
-from typing import Dict, List, Optional
+from typing import List
 
-# Sample data - in production, this would come from a database
-SAMPLE_DATA = {
-    "emea": [
-        {"latency_ms": 120, "status": "up"},
-        {"latency_ms": 150, "status": "up"},
-        {"latency_ms": 200, "status": "up"},
-        {"latency_ms": 90, "status": "up"},
-        {"latency_ms": 300, "status": "down"},
-        {"latency_ms": 160, "status": "up"},
-        {"latency_ms": 180, "status": "up"},
-        {"latency_ms": 220, "status": "up"},
-        {"latency_ms": 110, "status": "up"},
-        {"latency_ms": 190, "status": "up"}
-    ],
-    "apac": [
-        {"latency_ms": 140, "status": "up"},
-        {"latency_ms": 170, "status": "up"},
-        {"latency_ms": 210, "status": "up"},
-        {"latency_ms": 95, "status": "up"},
-        {"latency_ms": 250, "status": "down"},
-        {"latency_ms": 165, "status": "up"},
-        {"latency_ms": 195, "status": "up"},
-        {"latency_ms": 230, "status": "up"},
-        {"latency_ms": 125, "status": "up"},
-        {"latency_ms": 205, "status": "up"}
-    ],
-    "nam": [
-        {"latency_ms": 100, "status": "up"},
-        {"latency_ms": 130, "status": "up"},
-        {"latency_ms": 180, "status": "up"},
-        {"latency_ms": 80, "status": "up"},
-        {"latency_ms": 280, "status": "down"},
-        {"latency_ms": 140, "status": "up"},
-        {"latency_ms": 160, "status": "up"},
-        {"latency_ms": 200, "status": "up"},
-        {"latency_ms": 105, "status": "up"},
-        {"latency_ms": 175, "status": "up"}
-    ]
-}
+# Sample data from the provided JSON
+SAMPLE_DATA = [
+    {"region": "apac", "service": "catalog", "latency_ms": 195.09, "uptime_pct": 97.895, "timestamp": 20250301},
+    {"region": "apac", "service": "checkout", "latency_ms": 195.24, "uptime_pct": 98.173, "timestamp": 20250302},
+    {"region": "apac", "service": "payments", "latency_ms": 179.22, "uptime_pct": 97.68, "timestamp": 20250303},
+    {"region": "apac", "service": "recommendations", "latency_ms": 132.22, "uptime_pct": 98.523, "timestamp": 20250304},
+    {"region": "apac", "service": "payments", "latency_ms": 202.55, "uptime_pct": 97.403, "timestamp": 20250305},
+    {"region": "apac", "service": "catalog", "latency_ms": 162.14, "uptime_pct": 98.187, "timestamp": 20250306},
+    {"region": "apac", "service": "payments", "latency_ms": 189.19, "uptime_pct": 98.121, "timestamp": 20250307},
+    {"region": "apac", "service": "payments", "latency_ms": 184.87, "uptime_pct": 99.187, "timestamp": 20250308},
+    {"region": "apac", "service": "recommendations", "latency_ms": 139.03, "uptime_pct": 99.219, "timestamp": 20250309},
+    {"region": "apac", "service": "checkout", "latency_ms": 147.57, "uptime_pct": 97.577, "timestamp": 20250310},
+    {"region": "apac", "service": "analytics", "latency_ms": 129.86, "uptime_pct": 98.742, "timestamp": 20250311},
+    {"region": "apac", "service": "payments", "latency_ms": 164.57, "uptime_pct": 99.339, "timestamp": 20250312},
+    {"region": "emea", "service": "payments", "latency_ms": 122.71, "uptime_pct": 97.533, "timestamp": 20250301},
+    {"region": "emea", "service": "checkout", "latency_ms": 154.63, "uptime_pct": 98.736, "timestamp": 20250302},
+    {"region": "emea", "service": "support", "latency_ms": 226.6, "uptime_pct": 97.803, "timestamp": 20250303},
+    {"region": "emea", "service": "checkout", "latency_ms": 176.9, "uptime_pct": 98.641, "timestamp": 20250304},
+    {"region": "emea", "service": "checkout", "latency_ms": 197.09, "uptime_pct": 97.298, "timestamp": 20250305},
+    {"region": "emea", "service": "catalog", "latency_ms": 180.61, "uptime_pct": 99.238, "timestamp": 20250306},
+    {"region": "emea", "service": "payments", "latency_ms": 106.19, "uptime_pct": 99.085, "timestamp": 20250307},
+    {"region": "emea", "service": "analytics", "latency_ms": 174.88, "uptime_pct": 98.446, "timestamp": 20250308},
+    {"region": "emea", "service": "catalog", "latency_ms": 182.73, "uptime_pct": 98.383, "timestamp": 20250309},
+    {"region": "emea", "service": "checkout", "latency_ms": 137.64, "uptime_pct": 97.432, "timestamp": 20250310},
+    {"region": "emea", "service": "support", "latency_ms": 139.15, "uptime_pct": 98.843, "timestamp": 20250311},
+    {"region": "emea", "service": "analytics", "latency_ms": 191.43, "uptime_pct": 98.267, "timestamp": 20250312},
+    {"region": "amer", "service": "checkout", "latency_ms": 151.11, "uptime_pct": 97.361, "timestamp": 20250301},
+    {"region": "amer", "service": "catalog", "latency_ms": 123.89, "uptime_pct": 99.127, "timestamp": 20250302},
+    {"region": "amer", "service": "payments", "latency_ms": 117.05, "uptime_pct": 98.457, "timestamp": 20250303},
+    {"region": "amer", "service": "catalog", "latency_ms": 126.57, "uptime_pct": 98.617, "timestamp": 20250304},
+    {"region": "amer", "service": "recommendations", "latency_ms": 134.21, "uptime_pct": 98.947, "timestamp": 20250305},
+    {"region": "amer", "service": "catalog", "latency_ms": 235.33, "uptime_pct": 98.696, "timestamp": 20250306},
+    {"region": "amer", "service": "catalog", "latency_ms": 150.01, "uptime_pct": 98.007, "timestamp": 20250307},
+    {"region": "amer", "service": "checkout", "latency_ms": 155.11, "uptime_pct": 98.534, "timestamp": 20250308},
+    {"region": "amer", "service": "recommendations", "latency_ms": 154, "uptime_pct": 97.962, "timestamp": 20250309},
+    {"region": "amer", "service": "payments", "latency_ms": 178.81, "uptime_pct": 98.552, "timestamp": 20250310},
+    {"region": "amer", "service": "recommendations", "latency_ms": 150.03, "uptime_pct": 97.508, "timestamp": 20250311},
+    {"region": "amer", "service": "recommendations", "latency_ms": 170.54, "uptime_pct": 99.173, "timestamp": 20250312}
+]
 
 def calculate_percentile(data: List[float], percentile: float) -> float:
     """Calculate percentile from list of values"""
@@ -58,28 +58,31 @@ def calculate_percentile(data: List[float], percentile: float) -> float:
         upper = sorted_data[math.ceil(index)]
         return lower + (upper - lower) * (index - math.floor(index))
 
-def handler(request):
+def add_cors_headers(response):
+    """Add CORS headers to response"""
+    response['headers'] = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+    }
+    return response
+
+def main(request):
     try:
         # Handle CORS preflight
         if request.method == 'OPTIONS':
-            return {
+            response = {
                 'statusCode': 200,
-                'headers': {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type'
-                }
+                'body': ''
             }
+            return add_cors_headers(response)
         
         if request.method != 'POST':
-            return {
+            response = {
                 'statusCode': 405,
-                'headers': {
-                    'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json'
-                },
                 'body': json.dumps({'error': 'Method not allowed'})
             }
+            return add_cors_headers(response)
         
         # Parse request body
         body = request.body
@@ -90,29 +93,19 @@ def handler(request):
         threshold_ms = body.get('threshold_ms', 180)
         
         if not regions:
-            return {
+            response = {
                 'statusCode': 400,
-                'headers': {
-                    'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json'
-                },
                 'body': json.dumps({'error': 'No regions specified'})
             }
+            return add_cors_headers(response)
         
         results = {}
         
         for region in regions:
-            if region not in SAMPLE_DATA:
-                continue
-                
-            region_data = SAMPLE_DATA[region]
+            # Filter data for the current region
+            region_data = [item for item in SAMPLE_DATA if item['region'] == region]
             
-            # Filter only "up" status records for latency calculations
-            up_records = [r for r in region_data if r['status'] == 'up']
-            latencies = [r['latency_ms'] for r in up_records]
-            all_latencies = [r['latency_ms'] for r in region_data]
-            
-            if not latencies:
+            if not region_data:
                 results[region] = {
                     'avg_latency': 0,
                     'p95_latency': 0,
@@ -121,11 +114,15 @@ def handler(request):
                 }
                 continue
             
+            # Extract latencies and uptime percentages
+            latencies = [item['latency_ms'] for item in region_data]
+            uptimes = [item['uptime_pct'] for item in region_data]
+            
             # Calculate metrics
             avg_latency = sum(latencies) / len(latencies)
             p95_latency = calculate_percentile(latencies, 95)
-            avg_uptime = len(up_records) / len(region_data)
-            breaches = sum(1 for latency in all_latencies if latency > threshold_ms)
+            avg_uptime = sum(uptimes) / len(uptimes)
+            breaches = sum(1 for latency in latencies if latency > threshold_ms)
             
             results[region] = {
                 'avg_latency': round(avg_latency, 2),
@@ -134,21 +131,15 @@ def handler(request):
                 'breaches': breaches
             }
         
-        return {
+        response = {
             'statusCode': 200,
-            'headers': {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json'
-            },
             'body': json.dumps(results)
         }
+        return add_cors_headers(response)
     
     except Exception as e:
-        return {
+        response = {
             'statusCode': 500,
-            'headers': {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json'
-            },
             'body': json.dumps({'error': f'Internal server error: {str(e)}'})
         }
+        return add_cors_headers(response)
